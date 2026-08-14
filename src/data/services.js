@@ -447,8 +447,8 @@ export const getPlans = (service) => {
   const name = service?.title || "Service";
   return [
     { id: "basic", name: "Basic", price: 4999.99, badge: "STARTER", colorDark: "#888", colorLight: "#666", features: [`1x ${name}`,"Basic vulnerability report","Email support only","5 business day delivery","PDF report"] },
-    { id: "pro", name: "Professional", price: 7947.98, badge: "POPULAR", colorDark: "#00ffcc", colorLight: "#007a5e", features: [`3x ${name}`,"Detailed vulnerability report","WhatsApp + email support","3 business day delivery","PDF + video walkthrough","1 free re-test"] },
-    { id: "elite", name: "Elite", price: 9999.99, badge: "ENTERPRISE", colorDark: "#ffcc00", colorLight: "#b8860b", features: [`5x ${name}`,"Full pentest + remediation plan","Dedicated expert assigned","24-hour turnaround","Live call + screen share","3 re-tests + certificate","NDA + confidentiality agreement"] },
-    { id: "advanced", name: "Advanced", price: 14999.99, badge: "ULTIMATE", colorDark: "#ff6600", colorLight: "#b22222", features: [`Unlimited ${name}`,"Comprehensive pentest + remediation","Dedicated expert team","12-hour turnaround","Live call + screen share","5 re-tests + certificate","NDA + confidentiality agreement"] },
+    { id: "pro", name: "Professional", price: 9999.99, badge: "POPULAR", colorDark: "#00ffcc", colorLight: "#007a5e", features: [`3x ${name}`,"Detailed vulnerability report","WhatsApp + email support","3 business day delivery","PDF + video walkthrough","1 free re-test"] },
+    { id: "elite", name: "Elite", price: 14999.99, badge: "ENTERPRISE", colorDark: "#ffcc00", colorLight: "#b8860b", features: [`5x ${name}`,"Full pentest + remediation plan","Dedicated expert assigned","24-hour turnaround","Live call + screen share","3 re-tests + certificate","NDA + confidentiality agreement"] },
+    { id: "advanced", name: "Advanced", price: 19999.99, badge: "ULTIMATE", colorDark: "#ff6600", colorLight: "#b22222", features: [`Unlimited ${name}`,"Comprehensive pentest + remediation","Dedicated expert team","12-hour turnaround","Live call + screen share","5 re-tests + certificate","NDA + confidentiality agreement"] },
   ];
 };
