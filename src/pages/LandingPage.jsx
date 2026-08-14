@@ -6,6 +6,8 @@ import { SERVICES } from "../data/services";
 
 const WHATSAPP_NUM = "6285138798883";
 const C = "'Courier New', Courier, monospace";
+// Configurable Main Site URL for separate domain setup (e.g. "https://app.hacksecure.com")
+const MAIN_SITE_URL = (import.meta.env.VITE_MAIN_SITE_URL || "").replace(/\/$/, "");
 
 function openWhatsApp(text = "Hi HackSecure! I want to inquire about cybersecurity freelance services.") {
   window.open(`https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(text)}`, "_blank");
@@ -80,21 +82,31 @@ export default function LandingPage({ onEnterSite, onServiceSelect, onLoginClick
     setModalOpen(true);
   };
 
+  // Helper to redirect to main site or switch view
+  const navigateToMainSite = (targetService = null) => {
+    if (MAIN_SITE_URL && window.location.origin !== MAIN_SITE_URL) {
+      const query = "?lead=done" + (targetService?.id ? `&service=${encodeURIComponent(targetService.id)}` : "");
+      window.location.href = MAIN_SITE_URL + query;
+      return;
+    }
+    if (targetService && onServiceSelect) {
+      onServiceSelect(targetService);
+    } else if (onEnterSite) {
+      onEnterSite();
+    }
+  };
+
   // ── Handle Click to Go to Site ─────────────────────────────────────────────
   const handleSiteNavigation = (targetService = null) => {
     setMobileMenuOpen(false);
     if (localStorage.getItem("hs_lead_done") === "1") {
-      if (targetService && onServiceSelect) {
-        onServiceSelect(targetService);
-      } else if (onEnterSite) {
-        onEnterSite();
-      }
+      navigateToMainSite(targetService);
       return;
     }
     handleOpenLeadModal(targetService);
   };
 
-  // ── Form Submit ────────────────────────────────────────────────────────────
+  // ── Form Submit ────────────────────────────────────────────────────
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setFormError("");
@@ -127,11 +139,7 @@ export default function LandingPage({ onEnterSite, onServiceSelect, onLoginClick
 
       setTimeout(() => {
         setModalOpen(false);
-        if (selectedService && onServiceSelect) {
-          onServiceSelect(selectedService);
-        } else if (onEnterSite) {
-          onEnterSite();
-        }
+        navigateToMainSite(selectedService);
       }, 2200);
     } catch (err) {
       console.error("Error submitting lead:", err);
