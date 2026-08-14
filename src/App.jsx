@@ -3,10 +3,10 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import LandingPage from "./pages/LandingPage";
 import MainSite from "./pages/MainSite";
+import ServiceDetailPage from "./pages/ServiceDetailPage";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
 import AdminPanel from "./pages/AdminPanel";
-import LeadCapturePage from "./pages/LeadCapturePage";
 import { SERVICES } from "./data/services";
 import "./index.css";
 
@@ -48,7 +48,7 @@ function AppInner() {
   const [view, setView] = useState(determineInitialView);
   const [authMode, setAuthMode] = useState("login");
   const [pendingService, setPendingService] = useState(null);
-  const [leadService, setLeadService] = useState(null);
+  const [selectedDetailService, setSelectedDetailService] = useState(null);
 
   // Handle incoming query params (?lead=done & ?service=id)
   useEffect(() => {
@@ -58,7 +58,10 @@ function AppInner() {
       const serviceId = params.get("service");
       if (serviceId) {
         const found = SERVICES.find((s) => s.id === serviceId);
-        if (found) setPendingService(found);
+        if (found) {
+          setSelectedDetailService(found);
+          setPendingService(found);
+        }
       }
     }
   }, []);
@@ -87,46 +90,27 @@ function AppInner() {
     }
   }, [user]);
 
+  // Main Site Service Click: Directly open service detail page (NO form on main site)
   const handleServiceClick = (service) => {
-    // If lead form already done, skip it
-    if (localStorage.getItem("hs_lead_done") === "1") {
-      setPendingService(service);
-      if (!user) {
-        setAuthMode("login");
-        setView("auth");
-      } else {
-        setView("profile");
-      }
-      return;
-    }
-    // Otherwise show lead capture form first
-    setLeadService(service);
-    setView("lead");
+    setSelectedDetailService(service);
+    setView("service-detail");
   };
 
-  const handleLeadProceed = () => {
-    const svc = leadService;
-    setLeadService(null);
-    setView("site");
-    if (svc) {
-      setPendingService(svc);
-      if (!user) {
-        setAuthMode("login");
-        setView("auth");
-      } else {
-        setView("profile");
-      }
+  const handleSelectPlan = (service) => {
+    const target = service || selectedDetailService;
+    setPendingService(target);
+    if (!user) {
+      setAuthMode("login");
+      setView("auth");
+    } else {
+      setView("profile");
     }
-  };
-
-  const handleLeadSkip = () => {
-    setLeadService(null);
-    setView("site");
   };
 
   const handleLogout = async () => {
     await logout();
     setPendingService(null);
+    setSelectedDetailService(null);
     setView("landing");
     window.location.hash = "";
   };
@@ -139,7 +123,8 @@ function AppInner() {
           window.location.hash = "#site";
         }}
         onServiceSelect={(svc) => {
-          handleServiceClick(svc);
+          setSelectedDetailService(svc);
+          setView("service-detail");
         }}
         onLoginClick={() => {
           setAuthMode("login");
@@ -149,12 +134,15 @@ function AppInner() {
     );
   }
 
-  if (view === "lead") {
+  if (view === "service-detail" && selectedDetailService) {
     return (
-      <LeadCapturePage
-        service={leadService}
-        onProceed={handleLeadProceed}
-        onSkip={handleLeadSkip}
+      <ServiceDetailPage
+        service={selectedDetailService}
+        onSelectPlan={() => handleSelectPlan(selectedDetailService)}
+        onBack={() => {
+          setView("site");
+          setSelectedDetailService(null);
+        }}
       />
     );
   }
@@ -167,7 +155,7 @@ function AppInner() {
     return (
       <AuthPage
         mode={authMode}
-        onBack={() => { setView("landing"); setPendingService(null); }}
+        onBack={() => { setView("site"); setPendingService(null); }}
       />
     );
   }
