@@ -82,27 +82,8 @@ export default function LandingPage({ onEnterSite, onServiceSelect, onLoginClick
     setModalOpen(true);
   };
 
-  // Helper to redirect to main site or switch view
-  const navigateToMainSite = (targetService = null) => {
-    if (MAIN_SITE_URL && window.location.origin !== MAIN_SITE_URL) {
-      const query = "?lead=done" + (targetService?.id ? `&service=${encodeURIComponent(targetService.id)}` : "");
-      window.location.href = MAIN_SITE_URL + query;
-      return;
-    }
-    if (targetService && onServiceSelect) {
-      onServiceSelect(targetService);
-    } else if (onEnterSite) {
-      onEnterSite();
-    }
-  };
-
-  // ── Handle Click to Go to Site ─────────────────────────────────────────────
+  // ── Handle Service / CTA Click ─────────────────────────────────────────────
   const handleSiteNavigation = (targetService = null) => {
-    setMobileMenuOpen(false);
-    if (localStorage.getItem("hs_lead_done") === "1") {
-      navigateToMainSite(targetService);
-      return;
-    }
     handleOpenLeadModal(targetService);
   };
 
@@ -136,11 +117,7 @@ export default function LandingPage({ onEnterSite, onServiceSelect, onLoginClick
       localStorage.setItem("hs_lead_done", "1");
       setSubmitted(true);
       if (popupTimerRef.current) clearTimeout(popupTimerRef.current);
-
-      setTimeout(() => {
-        setModalOpen(false);
-        navigateToMainSite(selectedService);
-      }, 2200);
+      setSubmitting(false);
     } catch (err) {
       console.error("Error submitting lead:", err);
       setFormError("Connection issue. Please try WhatsApp directly or resubmit.");
@@ -300,22 +277,25 @@ export default function LandingPage({ onEnterSite, onServiceSelect, onLoginClick
             🚀 Get Consultation
           </button>
 
-          {/* Go to Site Link */}
+          {/* WhatsApp Direct */}
           <button
-            onClick={() => handleSiteNavigation()}
+            onClick={() => openWhatsApp("Hi HackSecure! I want to inquire about cybersecurity freelance services.")}
             style={{
-              background: "transparent",
-              color: t.accent,
-              border: `1px solid ${t.border}`,
+              background: "rgba(37,211,102,0.12)",
+              color: "#25d366",
+              border: "1px solid rgba(37,211,102,0.35)",
               borderRadius: 8,
-              padding: "7px 12px",
+              padding: "7px 14px",
               fontWeight: 700,
               fontSize: 12,
               cursor: "pointer",
               fontFamily: C,
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
             }}
           >
-            Visit Site →
+            💬 WhatsApp Us
           </button>
         </div>
 
@@ -1532,21 +1512,8 @@ export default function LandingPage({ onEnterSite, onServiceSelect, onLoginClick
             </button>
           </div>
 
-          <div style={{ marginTop: 20 }}>
-            <button
-              onClick={() => handleSiteNavigation()}
-              style={{
-                background: "none",
-                border: "none",
-                color: t.textMuted,
-                fontSize: 11.5,
-                cursor: "pointer",
-                fontFamily: C,
-                textDecoration: "underline",
-              }}
-            >
-              Or click here to enter the full service dashboard →
-            </button>
+          <div style={{ marginTop: 22, color: t.textMuted, fontSize: 12, fontFamily: C }}>
+            🔒 100% Confidential • 💰 5% Advance Only • ⚡ 24hr WhatsApp Response
           </div>
         </div>
       </section>
@@ -1754,35 +1721,68 @@ export default function LandingPage({ onEnterSite, onServiceSelect, onLoginClick
 
             {/* Success State */}
             {submitted ? (
-              <div style={{ padding: "40px 20px", textAlign: "center", animation: "popIn 0.35s ease" }}>
-                <div style={{ fontSize: 56, marginBottom: 12 }}>✅</div>
-                <h3 style={{ color: t.accent, fontSize: 20, fontWeight: 900, marginBottom: 10 }}>
-                  Request Received!
+              <div style={{ padding: "36px 20px", textAlign: "center", animation: "popIn 0.35s ease" }}>
+                <div style={{ fontSize: 52, marginBottom: 12 }}>✅</div>
+                <h3 style={{ color: t.accent, fontSize: "clamp(1.2rem, 4vw, 1.5rem)", fontWeight: 900, marginBottom: 10 }}>
+                  Thank You! Request Received
                 </h3>
-                <p style={{ color: t.textSub, fontSize: 13, lineHeight: 1.6, maxWidth: 360, margin: "0 auto 20px" }}>
-                  Our team member will reach out on WhatsApp within{" "}
-                  <span style={{ color: t.accent, fontWeight: 700 }}>24 hours</span>.
-                  <br />
-                  Connecting you to the full service dashboard now...
+                <p style={{ color: t.text, fontSize: 14, lineHeight: 1.6, maxWidth: 360, margin: "0 auto 16px" }}>
+                  We have successfully received your requirement details.
                 </p>
                 <div
                   style={{
-                    width: 180,
-                    height: 4,
-                    background: t.accentDim,
-                    borderRadius: 2,
-                    margin: "0 auto",
-                    overflow: "hidden",
+                    background: dark ? "rgba(0,255,204,0.06)" : "rgba(0,100,70,0.06)",
+                    border: `1px solid ${t.border}`,
+                    borderRadius: 12,
+                    padding: "16px 18px",
+                    maxWidth: 380,
+                    margin: "0 auto 22px",
+                    textAlign: "left",
                   }}
                 >
-                  <div
+                  <div style={{ color: t.accent, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", marginBottom: 6 }}>
+                    💬 OUR TEAM WILL CONNECT WITH YOU
+                  </div>
+                  <div style={{ color: t.textSub, fontSize: 12.5, lineHeight: 1.6 }}>
+                    Our team member will reach out to you on <strong style={{ color: t.text }}>WhatsApp within 24 hours</strong> with complete assistance and details.
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+                  <button
+                    onClick={() => openWhatsApp("Hi HackSecure! I just submitted my requirement on the website.")}
                     style={{
-                      height: "100%",
-                      background: t.accent,
-                      borderRadius: 2,
-                      animation: "fillBar 2.2s linear forwards",
+                      background: "#25d366",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "11px 18px",
+                      fontWeight: 700,
+                      fontSize: 12.5,
+                      cursor: "pointer",
+                      fontFamily: C,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
                     }}
-                  />
+                  >
+                    💬 Chat on WhatsApp
+                  </button>
+                  <button
+                    onClick={handleCloseModal}
+                    style={{
+                      background: t.accentDim,
+                      color: t.accent,
+                      border: `1px solid ${t.accent}`,
+                      borderRadius: 8,
+                      padding: "11px 18px",
+                      fontWeight: 700,
+                      fontSize: 12.5,
+                      cursor: "pointer",
+                      fontFamily: C,
+                    }}
+                  >
+                    Close Window
+                  </button>
                 </div>
               </div>
             ) : (
