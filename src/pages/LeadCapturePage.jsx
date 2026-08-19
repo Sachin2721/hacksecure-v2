@@ -71,6 +71,12 @@ export default function LeadCapturePage({ service, onProceed, onSkip }) {
         status: "new",
       });
       setSubmitted(true);
+      if (typeof window !== "undefined" && typeof window.fbq === "function") {
+        window.fbq("track", "Lead", {
+          content_name: service?.title || "Lead Capture Inquiry",
+          currency: "USD"
+        });
+      }
       // Mark permanently so form is never shown again on this browser
       localStorage.setItem("hs_lead_done", "1");
       // After 1.4s show the success then proceed

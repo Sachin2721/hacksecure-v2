@@ -10,6 +10,9 @@ const C = "'Courier New', Courier, monospace";
 const MAIN_SITE_URL = (import.meta.env.VITE_MAIN_SITE_URL || "").replace(/\/$/, "");
 
 function openWhatsApp(text = "Hi HackSecure! I want to inquire about cybersecurity freelance services.") {
+  if (typeof window !== "undefined" && typeof window.fbq === "function") {
+    window.fbq("track", "Contact");
+  }
   window.open(`https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(text)}`, "_blank");
 }
 
@@ -115,6 +118,12 @@ export default function LandingPage({ onEnterSite, onServiceSelect, onLoginClick
       });
 
       localStorage.setItem("hs_lead_done", "1");
+      if (typeof window !== "undefined" && typeof window.fbq === "function") {
+        window.fbq("track", "Lead", {
+          content_name: selectedService?.title || "General Landing Page Inquiry",
+          currency: "USD"
+        });
+      }
       setSubmitted(true);
       if (popupTimerRef.current) clearTimeout(popupTimerRef.current);
       setSubmitting(false);
